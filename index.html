@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plant Disease Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a; /* Dark background color */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white; /* Text color */
+        }
+        h1 {
+            font-size: 32px; /* Increased font size */
+            margin-bottom: 30px;
+        }
+        #accuracy {
+            font-size: 24px; /* Font size for accuracy */
+            margin-bottom: 20px; /* Add some space between accuracy and the form */
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-right: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ffffff; /* Light background color */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        input[type="file"]:hover {
+            background-color: #e0e0e0; /* Lighter background color on hover */
+            transform: scale(1.1); /* Scale up on hover */
+        }
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0); /* Glow effect */
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5); /* Enhanced glow effect on hover */
+        }
+        #result {
+            font-size: 24px; /* Increased font size for result */
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5); /* Text shadow for better visibility */
+            margin-bottom: 20px; /* Add some space between the result and the uploaded image */
+        }
+    </style>
+</head>
+<body>
+    <h1>Plant Disease Classifier</h1>
+    <div id="accuracy">Model Accuracy: {{ accuracy }}</div>
+    <form method="POST" action="/predict" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="submit" value="Classify">
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('result').innerText = "";  
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                alert(data.error);  
+            } else {
+                document.getElementById('result').innerText = data.result;
+                if (data.result === 'Healthy') {
+                    document.getElementById('result').style.color = '#4caf50'; // Green color for healthy result
+                } else {
+                    document.getElementById('result').style.color = '#ff5252'; // Red color for diseased result
+                }
+            }
+        });
+    </script>
+</body>
+</html>
